@@ -47,5 +47,5 @@ public abstract class AbstractKitchenServer {
      * Execute random delay and update the order status
      * {@link OrderStatus#Received} -> {@link OrderStatus#BeingPrepared} -> {@link OrderStatus#Ready}
      */
-    abstract protected void cook(Order order);
+    abstract protected void cook(Order order) throws InterruptedException;
 }
