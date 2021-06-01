@@ -5,15 +5,24 @@ import java.util.concurrent.*;
 
 public class KitchenServer extends AbstractKitchenServer{
 
+<<<<<<< Updated upstream
     private OrderClient orderClient;
     private KitchenStatus kitchenStatus;
     ExecutorService threadPool;
     Map<String, Order> orderMap;
+=======
+    OrderClient orderClient;
+    KitchenStatus kitchenStatus;
+>>>>>>> Stashed changes
 
-    public KitchenServer(OrderClient orderClient)
+    public KitchenServer()
     {
+<<<<<<< Updated upstream
         this.orderClient = orderClient;
         this.threadPool = Executors.newFixedThreadPool(10);
+=======
+
+>>>>>>> Stashed changes
     }
 
     /**
