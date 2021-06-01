@@ -2,7 +2,6 @@ package assignment5;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -46,6 +45,7 @@ public abstract class AbstractKitchenServer {
      * Simulate cooking in this method.
      * Execute random delay and update the order status
      * {@link OrderStatus#Received} -> {@link OrderStatus#BeingPrepared} -> {@link OrderStatus#Ready}
+     * @return
      */
-    abstract protected void cook(Order order) throws InterruptedException;
+    abstract protected Runnable cook(Order order) throws InterruptedException;
 }

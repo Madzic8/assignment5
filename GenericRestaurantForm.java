@@ -182,6 +182,5 @@ public class GenericRestaurantForm {
         orderStatusModel.addElement("19:02:03 Order submitted");
         orderStatusModel.addElement("19:02:05 Order accepted");
         frame.add(orderStatusArea);
-
     }
 }
