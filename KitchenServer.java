@@ -5,24 +5,15 @@ import java.util.concurrent.*;
 
 public class KitchenServer extends AbstractKitchenServer{
 
-<<<<<<< Updated upstream
+
     private OrderClient orderClient;
     private KitchenStatus kitchenStatus;
     ExecutorService threadPool;
     Map<String, Order> orderMap;
-=======
-    OrderClient orderClient;
-    KitchenStatus kitchenStatus;
->>>>>>> Stashed changes
 
     public KitchenServer()
     {
-<<<<<<< Updated upstream
-        this.orderClient = orderClient;
         this.threadPool = Executors.newFixedThreadPool(10);
-=======
-
->>>>>>> Stashed changes
     }
 
     /**
@@ -38,19 +29,20 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException {
-       Runnable receiveOrderAsync = () ->
-       {
-           try {
-               String orderID = order.getOrderID();
-               orderMap.put(orderID,order);
-               cook(order);
-           } catch (Exception e)
-           {
-               System.out.println(e);
-           }
-       };
-       threadPool.submit(receiveOrderAsync);
-        return null;
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    orderMap.put(order.getOrderID(), order);
+                    cook(order);
+                    return CompletableFuture.supplyAsync(KitchenStatus.Received);
+                } catch (Exception e)
+                {
+                    System.out.println(e);
+                    return KitchenStatus.Rejected;
+                }
+            }
+        }
     }
 
     /**
