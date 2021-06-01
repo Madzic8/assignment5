@@ -2,6 +2,9 @@ package assignment5;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 public class GenericRestaurantForm {
 
@@ -85,6 +88,12 @@ public class GenericRestaurantForm {
         menuItem1Button = new JButton();
         menuItem1Button.setBounds(180, 50, 100, 30);
         menuItem1Button.setText("add");
+        menuItem1Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Added menu 1");
+            }
+        });
         menuItem1.add(menuItem1Button);
 
         //**********************
@@ -113,6 +122,12 @@ public class GenericRestaurantForm {
         menuItem2Button = new JButton();
         menuItem2Button.setBounds(180, 50, 100, 30);
         menuItem2Button.setText("add");
+        menuItem2Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Added menu 2");
+            }
+        });
         menuItem2.add(menuItem2Button);
 
         //**********************
@@ -141,6 +156,12 @@ public class GenericRestaurantForm {
         menuItem3Button = new JButton();
         menuItem3Button.setBounds(180, 50, 100, 30);
         menuItem3Button.setText("add");
+        menuItem3Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Added menu 3");
+            }
+        });
         menuItem3.add(menuItem3Button);
 
         //*********************
@@ -161,11 +182,25 @@ public class GenericRestaurantForm {
         orderRemoveButton = new JButton();
         orderRemoveButton.setBounds(340, 300, 100, 30);
         orderRemoveButton.setText("remove");
+        orderRemoveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("An order has been removed.");
+                int index = orderCartArea.getSelectedIndex();
+                orderCartModel.removeElementAt(index);
+            }
+        });
         frame.add(orderRemoveButton);
 
         orderSubmitButton = new JButton();
         orderSubmitButton.setBounds(490, 300, 100, 30);
         orderSubmitButton.setText("order!");
+        orderSubmitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("A new order has been recieved.");
+            }
+        });
         frame.add(orderSubmitButton);
 
         //*********************
@@ -183,4 +218,5 @@ public class GenericRestaurantForm {
         orderStatusModel.addElement("19:02:05 Order accepted");
         frame.add(orderStatusArea);
     }
+
 }
