@@ -32,7 +32,7 @@ public abstract class AbstractOrderClient {
      *
      * Call {@link #pickUpOrder()} when status is {@link OrderStatus#Ready} and stop the {@link #pollingTimer}.
      */
-    abstract protected void startPollingServer(String orderId);
+    abstract protected void startPollingServer(String orderId) throws InterruptedException;
 
     /**
      * Start an asynchronous request to {@link AbstractKitchenServer#serveOrder(String)}
