@@ -30,7 +30,7 @@ public class KitchenServer extends AbstractKitchenServer{
     @Override
     public CompletableFuture<OrderStatus> checkStatus(String orderID) throws InterruptedException {
 
-        return
+        return null;
     }
 
     @Override
