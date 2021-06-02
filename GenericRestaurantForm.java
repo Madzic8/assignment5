@@ -6,6 +6,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Time;
+import java.time.LocalTime;
 
 public class GenericRestaurantForm {
 
@@ -231,6 +233,13 @@ public class GenericRestaurantForm {
         orderSubmitButton = new JButton();
         orderSubmitButton.setBounds(490, 300, 100, 30);
         orderSubmitButton.setText("order!");
+        orderSubmitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                orderClient.submitOrder();
+                orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
+            }
+        });
         frame.add(orderSubmitButton);
 
         //*********************
@@ -244,8 +253,10 @@ public class GenericRestaurantForm {
         orderStatusArea = new JList<String>(orderStatusModel);
         orderStatusArea.setBounds(620, 35, 250, 335);
         orderStatusArea.setBorder(BorderFactory.createLineBorder(Color.black));
-        orderStatusModel.addElement("19:02:03 Order submitted");
-        orderStatusModel.addElement("19:02:05 Order accepted");
         frame.add(orderStatusArea);
+    }
+
+    public DefaultListModel<String> getOrderStatusModel() {
+        return orderStatusModel;
     }
 }

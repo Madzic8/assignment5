@@ -31,9 +31,13 @@ public class OrderClient extends AbstractOrderClient{
             @Override
             public void run() {
                 try {
-                    kitchenServer.receiveOrder(order);
-                    startPollingServer(order.getOrderID());
-                } catch (InterruptedException e) {
+                    CompletableFuture<KitchenStatus> recieveOrderStatus = kitchenServer.receiveOrder(order);
+                    if (recieveOrderStatus.get() == KitchenStatus.Received)
+                    {
+                        startPollingServer(order.getOrderID());
+
+                    }
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -69,7 +73,6 @@ public class OrderClient extends AbstractOrderClient{
         pollingTimer.schedule(timerTask,1000);
 
     }
-
     /**
      * Start an asynchronous request to {@link AbstractKitchenServer#serveOrder(String)}
      */
@@ -90,5 +93,10 @@ public class OrderClient extends AbstractOrderClient{
 
     public Order getOrder() {
         return order;
+    }
+
+    public void OrderAccepted()
+    {
+
     }
 }

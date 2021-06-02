@@ -1,5 +1,7 @@
 package assignment5;
 
+import javax.swing.*;
+
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
@@ -7,5 +9,6 @@ public class Main {
         OrderClient orderClient = new OrderClient(kitchenServer);
         GenericRestaurantForm restaurant = new GenericRestaurantForm(orderClient);
         restaurant.Start();
+        DefaultListModel test = restaurant.getOrderStatusModel();
     }
 }
