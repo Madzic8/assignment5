@@ -48,5 +48,5 @@ public abstract class AbstractKitchenServer {
      * {@link OrderStatus#Received} -> {@link OrderStatus#BeingPrepared} -> {@link OrderStatus#Ready}
      * @return
      */
-    abstract protected Runnable cook(Order order) throws InterruptedException;
+    abstract protected void cook(Order order) throws InterruptedException;
 }

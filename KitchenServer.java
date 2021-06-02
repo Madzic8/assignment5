@@ -1,6 +1,8 @@
 package assignment5;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.*;
 
 public class KitchenServer extends AbstractKitchenServer{
@@ -10,6 +12,7 @@ public class KitchenServer extends AbstractKitchenServer{
     public KitchenServer()
     {
         this.threadPool = Executors.newFixedThreadPool(10);
+        this.orderMap = new HashMap<String,Order>();
     }
 
     /**
@@ -25,12 +28,24 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException, ExecutionException {
-        CompletableFuture<KitchenStatus> kitchenStatusCompletableFuture = new CompletableFuture<>();
-        orderMap.put(order.getOrderID(), order);
-        threadPool.execute(cook(order));
-        System.out.println("receiveOrder Method");
-       // return kitchenStatusCompletableFuture.complete(KitchenStatus.Received);
-return null;
+       if (order.getOrderList().size()==0)
+       {
+           System.out.println(KitchenStatus.Rejected.text);
+       }
+       else {
+           System.out.println(KitchenStatus.Received.text);
+           orderMap.put(KitchenStatus.Received.text, order);
+           return CompletableFuture.supplyAsync(() ->
+           {
+               try {
+                   cook(order);
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+               return KitchenStatus.Cooking;
+           }, threadPool);
+       }
+            return null;
     }
 
     /**
@@ -83,17 +98,29 @@ return null;
      */
 
     @Override
-    protected Runnable cook(Order order) throws InterruptedException {
+    public void cook(Order order) throws InterruptedException {
         try
         {
+            Random rng = new Random();
+            int rnd1 = rng.nextInt(2000);
+            int rnd2 = rng.nextInt(2000);
             System.out.println("cook Method");
+
+            Thread.sleep(rnd1);
+
             order.setStatus(OrderStatus.BeingPrepared);
-            Thread.sleep(1000);
+            orderMap.replace(OrderStatus.BeingPrepared.text, order);
+
+            Thread.sleep(rnd2);
+
             order.setStatus(OrderStatus.Ready);
+            orderMap.replace(OrderStatus.Ready.text, order);
+
+            System.out.println(OrderStatus.Ready.text);
+
         } catch (Exception e)
         {
             System.out.println(e);
         }
-        return null;
     }
 }
