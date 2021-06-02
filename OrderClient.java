@@ -2,10 +2,7 @@ package assignment5;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class OrderClient extends AbstractOrderClient{
 
@@ -26,22 +23,31 @@ public class OrderClient extends AbstractOrderClient{
      */
 
     @Override
-    public void submitOrder() {
-        threadpool.submit(new Runnable() {
+    public void submitOrder() throws ExecutionException, InterruptedException {
+        System.out.println("test");
+        Future<?> kitchenStatus = threadpool.submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    CompletableFuture<KitchenStatus> recieveOrderStatus = kitchenServer.receiveOrder(order);
-                    if (recieveOrderStatus.get() == KitchenStatus.Received)
-                    {
-                        startPollingServer(order.getOrderID());
-
-                    }
-                } catch (InterruptedException | ExecutionException e) {
+                    kitchenServer.receiveOrder(order);
+                }  catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
         });
+
+        try
+        {
+            if (kitchenStatus.get() == KitchenStatus.Received)
+            {
+                System.out.println("submitOrder Method");
+                startPollingServer(order.getOrderID());
+            }
+        } catch (Exception e)
+        {
+            System.out.println(e);
+        }
+
     }
 
     /**
@@ -62,6 +68,7 @@ public class OrderClient extends AbstractOrderClient{
                     orderStatus.get();
                     if (orderStatus.equals(OrderStatus.Ready))
                     {
+                        System.out.println("Start Polling Server Method");
                         pickUpOrder();
                         cancel();
                     }
@@ -70,7 +77,7 @@ public class OrderClient extends AbstractOrderClient{
                 }
             }
         };
-        pollingTimer.schedule(timerTask,1000);
+        pollingTimer.scheduleAtFixedRate(timerTask,1000, 10000);
 
     }
     /**
@@ -83,6 +90,7 @@ public class OrderClient extends AbstractOrderClient{
             @Override
             public void run() {
                 try {
+                    System.out.println("pickUpOrder Method");
                     kitchenServer.serveOrder(order.getOrderID());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -93,10 +101,5 @@ public class OrderClient extends AbstractOrderClient{
 
     public Order getOrder() {
         return order;
-    }
-
-    public void OrderAccepted()
-    {
-
     }
 }

@@ -24,14 +24,13 @@ public class KitchenServer extends AbstractKitchenServer{
      */
 
     @Override
-    public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException {
+    public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException, ExecutionException {
+        CompletableFuture<KitchenStatus> kitchenStatusCompletableFuture = new CompletableFuture<>();
         orderMap.put(order.getOrderID(), order);
-        threadPool.submit(cook(order));
-        if (order == null)
-        {
-            return CompletableFuture.supplyAsync(()-> KitchenStatus.Rejected);
-        }
-        else return CompletableFuture.supplyAsync(()-> KitchenStatus.Received);
+        threadPool.execute(cook(order));
+        System.out.println("receiveOrder Method");
+       // return kitchenStatusCompletableFuture.complete(KitchenStatus.Received);
+return null;
     }
 
     /**
@@ -43,6 +42,7 @@ public class KitchenServer extends AbstractKitchenServer{
     public CompletableFuture<OrderStatus> checkStatus(String orderID) throws InterruptedException {
         Order order = orderMap.get(orderID);
         OrderStatus status = order.getStatus();
+        System.out.println("checkStatus Method");
         return CompletableFuture.supplyAsync(()-> status);
     }
 
@@ -71,6 +71,7 @@ public class KitchenServer extends AbstractKitchenServer{
             }
         };
         threadPool.submit(task);
+        System.out.println("serveOrder Method");
         return CompletableFuture.supplyAsync(()->KitchenStatus.Served);
     }
 
@@ -85,6 +86,7 @@ public class KitchenServer extends AbstractKitchenServer{
     protected Runnable cook(Order order) throws InterruptedException {
         try
         {
+            System.out.println("cook Method");
             order.setStatus(OrderStatus.BeingPrepared);
             Thread.sleep(1000);
             order.setStatus(OrderStatus.Ready);

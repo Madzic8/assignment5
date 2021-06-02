@@ -4,6 +4,7 @@ import java.util.Map;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,7 +16,7 @@ public abstract class AbstractOrderClient {
      * Start an asynchronous request to {@link AbstractKitchenServer#receiveOrder(Order)}
      * Also start {@link #startPollingServer(String)}
      */
-    abstract public void submitOrder();
+    abstract public void submitOrder() throws ExecutionException, InterruptedException;
 
     /**
      * Start a new task with a periodic timer {@link #pollingTimer}

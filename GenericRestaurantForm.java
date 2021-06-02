@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.concurrent.ExecutionException;
 
 public class GenericRestaurantForm {
 
@@ -236,7 +237,11 @@ public class GenericRestaurantForm {
         orderSubmitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                orderClient.submitOrder();
+                try {
+                    orderClient.submitOrder();
+                } catch (InterruptedException | ExecutionException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
                 orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
             }
         });

@@ -12,4 +12,8 @@ public enum KitchenStatus {
     private KitchenStatus(String name){
         this.text = name;
     }
+
+    public String getText() {
+        return text;
+    }
 }
