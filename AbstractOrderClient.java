@@ -11,15 +11,6 @@ public abstract class AbstractOrderClient {
     private Order order;
     private AbstractKitchenServer kitchenServer;
     Timer pollingTimer;
-
-    public void addItemToOrder(OrderItem item) {
-        order.addOrderItem(item);
-    }
-
-    public void removeItemToOrder(OrderItem item) {
-        order.removeOrderItem(item);
-    }
-
     /**
      * Start an asynchronous request to {@link AbstractKitchenServer#receiveOrder(Order)}
      * Also start {@link #startPollingServer(String)}

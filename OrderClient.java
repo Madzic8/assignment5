@@ -3,19 +3,21 @@ package assignment5;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class OrderClient extends AbstractOrderClient{
 
     private Order order;
-    private AbstractKitchenServer kitchenServer;
+    private KitchenServer kitchenServer;
     Timer pollingTimer;
     ExecutorService threadpool;
     public OrderClient(KitchenServer kitchenServer)
     {
         this.kitchenServer = kitchenServer;
-        threadpool = Executors.newFixedThreadPool(10);
+        this.order = new Order();
+        this.threadpool = Executors.newFixedThreadPool(10);
     }
 
     /**
@@ -29,9 +31,13 @@ public class OrderClient extends AbstractOrderClient{
             @Override
             public void run() {
                 try {
-                    kitchenServer.receiveOrder(order);
-                    startPollingServer(order.getOrderID());
-                } catch (InterruptedException e) {
+                    CompletableFuture<KitchenStatus> recieveOrderStatus = kitchenServer.receiveOrder(order);
+                    if (recieveOrderStatus.get() == KitchenStatus.Received)
+                    {
+                        startPollingServer(order.getOrderID());
+
+                    }
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -53,13 +59,13 @@ public class OrderClient extends AbstractOrderClient{
             public void run() {
                 try {
                     CompletableFuture<OrderStatus> orderStatus = kitchenServer.checkStatus(orderId);
+                    orderStatus.get();
                     if (orderStatus.equals(OrderStatus.Ready))
                     {
                         pickUpOrder();
                         cancel();
-
                     }
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
@@ -67,7 +73,6 @@ public class OrderClient extends AbstractOrderClient{
         pollingTimer.schedule(timerTask,1000);
 
     }
-
     /**
      * Start an asynchronous request to {@link AbstractKitchenServer#serveOrder(String)}
      */
@@ -84,5 +89,14 @@ public class OrderClient extends AbstractOrderClient{
                 }
             }
         });
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void OrderAccepted()
+    {
+
     }
 }

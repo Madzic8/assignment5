@@ -4,10 +4,6 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 public class KitchenServer extends AbstractKitchenServer{
-
-
-    private OrderClient orderClient;
-    private KitchenStatus kitchenStatus;
     ExecutorService threadPool;
     Map<String, Order> orderMap;
 
@@ -29,20 +25,13 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    orderMap.put(order.getOrderID(), order);
-                    cook(order);
-                    return CompletableFuture.supplyAsync(KitchenStatus.Received);
-                } catch (Exception e)
-                {
-                    System.out.println(e);
-                    return KitchenStatus.Rejected;
-                }
-            }
+        orderMap.put(order.getOrderID(), order);
+        threadPool.submit(cook(order));
+        if (order == null)
+        {
+            return CompletableFuture.supplyAsync(()-> KitchenStatus.Rejected);
         }
+        else return CompletableFuture.supplyAsync(()-> KitchenStatus.Received);
     }
 
     /**
@@ -52,18 +41,9 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<OrderStatus> checkStatus(String orderID) throws InterruptedException {
-        Runnable checkStatusAsync = () ->
-        {
-            try {
-                Order order = orderMap.get(orderID);
-               OrderStatus status = order.getStatus();
-            } catch (Exception e)
-            {
-                System.out.println(e);
-            }
-        };
-        threadPool.submit(checkStatusAsync);
-        return orderStatus.join();
+        Order order = orderMap.get(orderID);
+        OrderStatus status = order.getStatus();
+        return CompletableFuture.supplyAsync(()-> status);
     }
 
     /**
@@ -76,18 +56,22 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<KitchenStatus> serveOrder(String orderID) throws InterruptedException {
-        Runnable serveOrderAsync = () ->
-        {
-            try {
-                orderMap.get(orderID);
-                kitchenStatus
-            } catch (Exception e)
-            {
-                System.out.println(e);
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Order order = orderMap.get(orderID);
+                    order.setStatus(OrderStatus.BeingPrepared);
+                    Thread.sleep(1000);
+                    order.setStatus(OrderStatus.Served);
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
-        threadPool.submit(serveOrderAsync);
-        return null;
+        threadPool.submit(task);
+        return CompletableFuture.supplyAsync(()->KitchenStatus.Served);
     }
 
     /**
@@ -110,9 +94,4 @@ public class KitchenServer extends AbstractKitchenServer{
         }
         return null;
     }
-
-    public KitchenStatus getKitchenStatus() {
-        return kitchenStatus;
-    }
-
 }

@@ -1,10 +1,17 @@
 package assignment5;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+<<<<<<< HEAD
 import java.util.List;
+=======
+import java.sql.Time;
+import java.time.LocalTime;
+>>>>>>> MadsBranch
 
 public class GenericRestaurantForm {
 
@@ -40,7 +47,17 @@ public class GenericRestaurantForm {
     DefaultListModel<String> orderStatusModel;   // Stores a list of string that is displayed at orderStatusArea
     JList<String> orderStatusArea;               // To display status of the submitted order
 
-    public GenericRestaurantForm(){}
+    int selectedIndex;
+    String selectedItem = "";
+    OrderClient orderClient;
+
+    OrderItem coffee;
+    OrderItem borscht;
+    OrderItem sandwich;
+
+    public GenericRestaurantForm(OrderClient orderClient){
+        this.orderClient = orderClient;
+    }
 
     /**
      * Starts the application
@@ -95,6 +112,15 @@ public class GenericRestaurantForm {
             }
         });
         menuItem1.add(menuItem1Button);
+        menuItem1Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Order order = orderClient.getOrder();
+                orderCartModel.addElement("Sandwich");
+                sandwich = new OrderItem(menuItem1Name.getText(), menuItem1Descr.getText(), 23);
+                order.addOrderItem(sandwich);
+            }
+        });
 
         //**********************
         //*** Menu item 2 *****
@@ -129,6 +155,15 @@ public class GenericRestaurantForm {
             }
         });
         menuItem2.add(menuItem2Button);
+        menuItem2Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Order order = orderClient.getOrder();
+                orderCartModel.addElement("Borscht");
+                borscht = new OrderItem(menuItem2Name.getText(), menuItem2Descr.getText(), 84);
+                order.addOrderItem(borscht);
+            }
+        });
 
         //**********************
         //*** Menu item 3 *****
@@ -163,6 +198,15 @@ public class GenericRestaurantForm {
             }
         });
         menuItem3.add(menuItem3Button);
+        menuItem3Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Order order = orderClient.getOrder();
+                orderCartModel.addElement("Coffee");
+                coffee = new OrderItem(menuItem3Name.getText(), menuItem3Descr.getText(), 18);
+                order.addOrderItem(coffee);
+            }
+        });
 
         //*********************
         //*** Order cart  *****
@@ -177,6 +221,7 @@ public class GenericRestaurantForm {
         orderCartArea.setBorder(BorderFactory.createLineBorder(Color.black));
         orderCartModel.addElement("Sandwich");
         orderCartModel.addElement("Coffee");
+
         frame.add(orderCartArea);
 
         orderRemoveButton = new JButton();
@@ -185,9 +230,30 @@ public class GenericRestaurantForm {
         orderRemoveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+<<<<<<< HEAD
                 System.out.println("An order has been removed.");
                 int index = orderCartArea.getSelectedIndex();
                 orderCartModel.removeElementAt(index);
+=======
+                selectedIndex = orderCartArea.getSelectedIndex();
+                selectedItem = orderCartArea.getSelectedValue();
+                orderCartModel.remove(selectedIndex);
+
+               Order order = orderClient.getOrder();
+
+                if (selectedItem == "Coffee")
+                {
+                    order.removeOrderItem(coffee);
+                }
+                if (selectedItem == "Sandwich")
+                {
+                    order.removeOrderItem(sandwich);
+                }
+                if (selectedItem == "Borscht")
+                {
+                    order.removeOrderItem(borscht);
+                }
+>>>>>>> MadsBranch
             }
         });
         frame.add(orderRemoveButton);
@@ -198,7 +264,12 @@ public class GenericRestaurantForm {
         orderSubmitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+<<<<<<< HEAD
                 System.out.println("A new order has been recieved.");
+=======
+                orderClient.submitOrder();
+                orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
+>>>>>>> MadsBranch
             }
         });
         frame.add(orderSubmitButton);
@@ -214,9 +285,13 @@ public class GenericRestaurantForm {
         orderStatusArea = new JList<String>(orderStatusModel);
         orderStatusArea.setBounds(620, 35, 250, 335);
         orderStatusArea.setBorder(BorderFactory.createLineBorder(Color.black));
-        orderStatusModel.addElement("19:02:03 Order submitted");
-        orderStatusModel.addElement("19:02:05 Order accepted");
         frame.add(orderStatusArea);
     }
 
+<<<<<<< HEAD
+=======
+    public DefaultListModel<String> getOrderStatusModel() {
+        return orderStatusModel;
+    }
+>>>>>>> MadsBranch
 }
