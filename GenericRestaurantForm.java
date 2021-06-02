@@ -1,7 +1,11 @@
 package assignment5;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class GenericRestaurantForm {
 
@@ -37,7 +41,17 @@ public class GenericRestaurantForm {
     DefaultListModel<String> orderStatusModel;   // Stores a list of string that is displayed at orderStatusArea
     JList<String> orderStatusArea;               // To display status of the submitted order
 
-    public GenericRestaurantForm(){}
+    int selectedIndex;
+    String selectedItem = "";
+    OrderClient orderClient;
+
+    OrderItem coffee;
+    OrderItem borscht;
+    OrderItem sandwich;
+
+    public GenericRestaurantForm(OrderClient orderClient){
+        this.orderClient = orderClient;
+    }
 
     /**
      * Starts the application
@@ -86,6 +100,15 @@ public class GenericRestaurantForm {
         menuItem1Button.setBounds(180, 50, 100, 30);
         menuItem1Button.setText("add");
         menuItem1.add(menuItem1Button);
+        menuItem1Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Order order = orderClient.getOrder();
+                orderCartModel.addElement("Sandwich");
+                sandwich = new OrderItem(menuItem1Name.getText(), menuItem1Descr.getText(), 23);
+                order.addOrderItem(sandwich);
+            }
+        });
 
         //**********************
         //*** Menu item 2 *****
@@ -114,6 +137,15 @@ public class GenericRestaurantForm {
         menuItem2Button.setBounds(180, 50, 100, 30);
         menuItem2Button.setText("add");
         menuItem2.add(menuItem2Button);
+        menuItem2Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Order order = orderClient.getOrder();
+                orderCartModel.addElement("Borscht");
+                borscht = new OrderItem(menuItem2Name.getText(), menuItem2Descr.getText(), 84);
+                order.addOrderItem(borscht);
+            }
+        });
 
         //**********************
         //*** Menu item 3 *****
@@ -142,6 +174,15 @@ public class GenericRestaurantForm {
         menuItem3Button.setBounds(180, 50, 100, 30);
         menuItem3Button.setText("add");
         menuItem3.add(menuItem3Button);
+        menuItem3Button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Order order = orderClient.getOrder();
+                orderCartModel.addElement("Coffee");
+                coffee = new OrderItem(menuItem3Name.getText(), menuItem3Descr.getText(), 18);
+                order.addOrderItem(coffee);
+            }
+        });
 
         //*********************
         //*** Order cart  *****
@@ -156,11 +197,35 @@ public class GenericRestaurantForm {
         orderCartArea.setBorder(BorderFactory.createLineBorder(Color.black));
         orderCartModel.addElement("Sandwich");
         orderCartModel.addElement("Coffee");
+
         frame.add(orderCartArea);
 
         orderRemoveButton = new JButton();
         orderRemoveButton.setBounds(340, 300, 100, 30);
         orderRemoveButton.setText("remove");
+        orderRemoveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectedIndex = orderCartArea.getSelectedIndex();
+                selectedItem = orderCartArea.getSelectedValue();
+                orderCartModel.remove(selectedIndex);
+
+               Order order = orderClient.getOrder();
+
+                if (selectedItem == "Coffee")
+                {
+                    order.removeOrderItem(coffee);
+                }
+                if (selectedItem == "Sandwich")
+                {
+                    order.removeOrderItem(sandwich);
+                }
+                if (selectedItem == "Borscht")
+                {
+                    order.removeOrderItem(borscht);
+                }
+            }
+        });
         frame.add(orderRemoveButton);
 
         orderSubmitButton = new JButton();
