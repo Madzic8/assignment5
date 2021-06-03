@@ -29,5 +29,5 @@ public abstract class AbstractOrderClient {
     /**
      * Start an asynchronous request to {@link AbstractKitchenServer#serveOrder(String)}
      */
-    abstract protected void pickUpOrder();
+    abstract protected void pickUpOrder() throws InterruptedException, ExecutionException;
 }

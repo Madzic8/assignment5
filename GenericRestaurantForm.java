@@ -198,8 +198,6 @@ public class GenericRestaurantForm {
         orderCartArea = new JList<String>(orderCartModel);
         orderCartArea.setBounds(340, 35, 250, 250);
         orderCartArea.setBorder(BorderFactory.createLineBorder(Color.black));
-        orderCartModel.addElement("Sandwich");
-        orderCartModel.addElement("Coffee");
 
         frame.add(orderCartArea);
 
@@ -217,14 +215,17 @@ public class GenericRestaurantForm {
 
                 if (selectedItem == "Coffee")
                 {
+                    System.out.println("Added Coffee");
                     order.removeOrderItem(coffee);
                 }
                 if (selectedItem == "Sandwich")
                 {
+                    System.out.println("Added Sandwich");
                     order.removeOrderItem(sandwich);
                 }
                 if (selectedItem == "Borscht")
                 {
+                    System.out.println("Added Borscht");
                     order.removeOrderItem(borscht);
                 }
             }
@@ -237,12 +238,19 @@ public class GenericRestaurantForm {
         orderSubmitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+               Order order = orderClient.getOrder();
                 try {
-                    orderClient.submitOrder();
+                    if (order.getOrderList().size() == 0)
+                    {
+                        JOptionPane.showMessageDialog(null,"Cannot submit an empty order..");
+                    } else if (order.getOrderList().size() != 0)
+                    {
+                        orderClient.submitOrder();
+                        orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
+                    }
                 } catch (InterruptedException | ExecutionException interruptedException) {
                     interruptedException.printStackTrace();
                 }
-                orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
             }
         });
         frame.add(orderSubmitButton);
