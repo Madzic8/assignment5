@@ -1,6 +1,7 @@
 package assignment5;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.CompletableFuture;
 
@@ -24,7 +25,7 @@ public abstract class AbstractKitchenServer {
      * Note that the methods should sleep for a random duration before it returns a status.
      * This is to simulate an actual server-call that might operate slowly.
      */
-    abstract public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException;
+    abstract public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException, ExecutionException;
 
     /**
      * Note that the methods should sleep for a random duration before it returns a status.
@@ -47,5 +48,5 @@ public abstract class AbstractKitchenServer {
      * {@link OrderStatus#Received} -> {@link OrderStatus#BeingPrepared} -> {@link OrderStatus#Ready}
      * @return
      */
-    abstract protected Runnable cook(Order order) throws InterruptedException;
+    abstract protected void cook(Order order) throws InterruptedException;
 }

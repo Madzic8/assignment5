@@ -1,6 +1,8 @@
 package assignment5;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.*;
 
 public class KitchenServer extends AbstractKitchenServer{
@@ -10,6 +12,7 @@ public class KitchenServer extends AbstractKitchenServer{
     public KitchenServer()
     {
         this.threadPool = Executors.newFixedThreadPool(10);
+        this.orderMap = new HashMap<String,Order>();
     }
 
     /**
@@ -24,14 +27,22 @@ public class KitchenServer extends AbstractKitchenServer{
      */
 
     @Override
-    public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException {
-        orderMap.put(order.getOrderID(), order);
-        threadPool.submit(cook(order));
-        if (order == null)
-        {
-            return CompletableFuture.supplyAsync(()-> KitchenStatus.Rejected);
+    public CompletableFuture<KitchenStatus> receiveOrder(Order order) throws InterruptedException, ExecutionException {
+        CompletableFuture<KitchenStatus> future = new CompletableFuture<>();
+        try{
+            orderMap.put(String.valueOf(order.getOrderID()), order);
+            future.complete(KitchenStatus.Received);
+            threadPool.submit(() -> {
+                try {
+                    cook(order);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch(Exception e) {
+            future.complete(KitchenStatus.Rejected);
         }
-        else return CompletableFuture.supplyAsync(()-> KitchenStatus.Received);
+        return future;
     }
 
     /**
@@ -41,9 +52,11 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<OrderStatus> checkStatus(String orderID) throws InterruptedException {
+        CompletableFuture<OrderStatus> future = new CompletableFuture<>();
         Order order = orderMap.get(orderID);
         OrderStatus status = order.getStatus();
-        return CompletableFuture.supplyAsync(()-> status);
+        future.complete(status);
+        return future;
     }
 
     /**
@@ -56,22 +69,19 @@ public class KitchenServer extends AbstractKitchenServer{
 
     @Override
     public CompletableFuture<KitchenStatus> serveOrder(String orderID) throws InterruptedException {
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Order order = orderMap.get(orderID);
-                    order.setStatus(OrderStatus.BeingPrepared);
-                    Thread.sleep(1000);
-                    order.setStatus(OrderStatus.Served);
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        CompletableFuture<KitchenStatus> future = new CompletableFuture();
+            try {
+                Order order = orderMap.get(orderID);
+                Thread.sleep(1000);
+                order.setStatus(OrderStatus.Served);
+                Thread.sleep(1000);
+                System.out.println("Order is ready to get served...");
+                future.complete(KitchenStatus.Served);
+            } catch (Exception e)
+            {
+                System.out.println(e);
             }
-        };
-        threadPool.submit(task);
-        return CompletableFuture.supplyAsync(()->KitchenStatus.Served);
+            return future;
     }
 
     /**
@@ -82,16 +92,25 @@ public class KitchenServer extends AbstractKitchenServer{
      */
 
     @Override
-    protected Runnable cook(Order order) throws InterruptedException {
+    public void cook(Order order) throws InterruptedException {
         try
         {
+
+            System.out.println("Preparing order...");
             order.setStatus(OrderStatus.BeingPrepared);
-            Thread.sleep(1000);
+            orderMap.replace(OrderStatus.BeingPrepared.text, order);
+            Thread.sleep(1500);
+
+            System.out.println("Cooking order...");
             order.setStatus(OrderStatus.Ready);
+            orderMap.replace(OrderStatus.Ready.text, order);
+            Thread.sleep(1000);
+
+            System.out.println("Order is ready...");
+            Thread.sleep(2000);
         } catch (Exception e)
         {
             System.out.println(e);
         }
-        return null;
     }
 }

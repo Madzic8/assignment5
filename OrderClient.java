@@ -2,22 +2,18 @@ package assignment5;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class OrderClient extends AbstractOrderClient{
 
     private Order order;
     private KitchenServer kitchenServer;
     Timer pollingTimer;
-    ExecutorService threadpool;
+
     public OrderClient(KitchenServer kitchenServer)
     {
         this.kitchenServer = kitchenServer;
         this.order = new Order();
-        this.threadpool = Executors.newFixedThreadPool(10);
     }
 
     /**
@@ -26,22 +22,22 @@ public class OrderClient extends AbstractOrderClient{
      */
 
     @Override
-    public void submitOrder() {
-        threadpool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    CompletableFuture<KitchenStatus> recieveOrderStatus = kitchenServer.receiveOrder(order);
-                    if (recieveOrderStatus.get() == KitchenStatus.Received)
-                    {
-                        startPollingServer(order.getOrderID());
-
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
+    public void submitOrder() throws ExecutionException, InterruptedException {
+        System.out.println("Order Submitted...");
+        Thread.sleep(500);
+       CompletableFuture kitchenStatus = kitchenServer.receiveOrder(order);
+        try
+        {
+            if (kitchenStatus.get() == KitchenStatus.Received)
+            {
+                System.out.println("Order received...");
+                Thread.sleep(500);
+                startPollingServer(order.getOrderID());
             }
-        });
+        } catch (Exception e)
+        {
+            System.out.println(e);
+        }
     }
 
     /**
@@ -55,48 +51,45 @@ public class OrderClient extends AbstractOrderClient{
     protected void startPollingServer(String orderId) throws InterruptedException {
         pollingTimer = new Timer();
         TimerTask timerTask = new TimerTask() {
+            int i = 1;
             @Override
             public void run() {
-                try {
-                    CompletableFuture<OrderStatus> orderStatus = kitchenServer.checkStatus(orderId);
-                    orderStatus.get();
-                    if (orderStatus.equals(OrderStatus.Ready))
-                    {
-                        pickUpOrder();
-                        cancel();
+                while (i == 1) {
+                    try {
+                        CompletableFuture orderStatus = kitchenServer.checkStatus(order.getOrderID());
+                        if (orderStatus.get() == OrderStatus.Ready) {
+                            System.out.println("Waiting for order to be ready...");
+                            pickUpOrder();
+                            cancel();
+                            i = 2;
+                        }
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
                 }
+
             }
         };
-        pollingTimer.schedule(timerTask,1000);
-
+        pollingTimer.scheduleAtFixedRate(timerTask, 500, 20000);
     }
     /**
      * Start an asynchronous request to {@link AbstractKitchenServer#serveOrder(String)}
      */
 
     @Override
-    protected void pickUpOrder() {
-        threadpool.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    kitchenServer.serveOrder(order.getOrderID());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    protected void pickUpOrder() throws InterruptedException, ExecutionException {
+        System.out.println("Order is getting picked up...");
+       CompletableFuture  kitchenStatus = kitchenServer.serveOrder(order.getOrderID());
+       if (kitchenStatus.get() == KitchenStatus.Served)
+       {
+           Thread.sleep(1000);
+           System.out.println("Order is "+ order.getStatus().text);
+       }
+        else
+           System.out.println("something went wrong");
     }
 
     public Order getOrder() {
         return order;
-    }
-
-    public void OrderAccepted()
-    {
-
     }
 }

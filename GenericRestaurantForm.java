@@ -6,12 +6,9 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-<<<<<<< HEAD
-import java.util.List;
-=======
 import java.sql.Time;
 import java.time.LocalTime;
->>>>>>> MadsBranch
+import java.util.concurrent.ExecutionException;
 
 public class GenericRestaurantForm {
 
@@ -105,12 +102,6 @@ public class GenericRestaurantForm {
         menuItem1Button = new JButton();
         menuItem1Button.setBounds(180, 50, 100, 30);
         menuItem1Button.setText("add");
-        menuItem1Button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Added menu 1");
-            }
-        });
         menuItem1.add(menuItem1Button);
         menuItem1Button.addActionListener(new ActionListener() {
             @Override
@@ -148,12 +139,6 @@ public class GenericRestaurantForm {
         menuItem2Button = new JButton();
         menuItem2Button.setBounds(180, 50, 100, 30);
         menuItem2Button.setText("add");
-        menuItem2Button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Added menu 2");
-            }
-        });
         menuItem2.add(menuItem2Button);
         menuItem2Button.addActionListener(new ActionListener() {
             @Override
@@ -191,12 +176,6 @@ public class GenericRestaurantForm {
         menuItem3Button = new JButton();
         menuItem3Button.setBounds(180, 50, 100, 30);
         menuItem3Button.setText("add");
-        menuItem3Button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Added menu 3");
-            }
-        });
         menuItem3.add(menuItem3Button);
         menuItem3Button.addActionListener(new ActionListener() {
             @Override
@@ -219,8 +198,6 @@ public class GenericRestaurantForm {
         orderCartArea = new JList<String>(orderCartModel);
         orderCartArea.setBounds(340, 35, 250, 250);
         orderCartArea.setBorder(BorderFactory.createLineBorder(Color.black));
-        orderCartModel.addElement("Sandwich");
-        orderCartModel.addElement("Coffee");
 
         frame.add(orderCartArea);
 
@@ -230,11 +207,6 @@ public class GenericRestaurantForm {
         orderRemoveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
-                System.out.println("An order has been removed.");
-                int index = orderCartArea.getSelectedIndex();
-                orderCartModel.removeElementAt(index);
-=======
                 selectedIndex = orderCartArea.getSelectedIndex();
                 selectedItem = orderCartArea.getSelectedValue();
                 orderCartModel.remove(selectedIndex);
@@ -243,17 +215,19 @@ public class GenericRestaurantForm {
 
                 if (selectedItem == "Coffee")
                 {
+                    System.out.println("Added Coffee");
                     order.removeOrderItem(coffee);
                 }
                 if (selectedItem == "Sandwich")
                 {
+                    System.out.println("Added Sandwich");
                     order.removeOrderItem(sandwich);
                 }
                 if (selectedItem == "Borscht")
                 {
+                    System.out.println("Added Borscht");
                     order.removeOrderItem(borscht);
                 }
->>>>>>> MadsBranch
             }
         });
         frame.add(orderRemoveButton);
@@ -264,12 +238,19 @@ public class GenericRestaurantForm {
         orderSubmitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
-                System.out.println("A new order has been recieved.");
-=======
-                orderClient.submitOrder();
-                orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
->>>>>>> MadsBranch
+               Order order = orderClient.getOrder();
+                try {
+                    if (order.getOrderList().size() == 0)
+                    {
+                        JOptionPane.showMessageDialog(null,"Cannot submit an empty order..");
+                    } else if (order.getOrderList().size() != 0)
+                    {
+                        orderClient.submitOrder();
+                        orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
+                    }
+                } catch (InterruptedException | ExecutionException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
             }
         });
         frame.add(orderSubmitButton);
@@ -288,10 +269,7 @@ public class GenericRestaurantForm {
         frame.add(orderStatusArea);
     }
 
-<<<<<<< HEAD
-=======
     public DefaultListModel<String> getOrderStatusModel() {
         return orderStatusModel;
     }
->>>>>>> MadsBranch
 }
