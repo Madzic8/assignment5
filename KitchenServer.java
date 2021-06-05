@@ -75,7 +75,6 @@ public class KitchenServer extends AbstractKitchenServer{
                 Thread.sleep(1000);
                 order.setStatus(OrderStatus.Served);
                 Thread.sleep(1000);
-                System.out.println("Order is ready to get served...");
                 future.complete(KitchenStatus.Served);
             } catch (Exception e)
             {
@@ -95,18 +94,14 @@ public class KitchenServer extends AbstractKitchenServer{
     public void cook(Order order) throws InterruptedException {
         try
         {
-
-            System.out.println("Preparing order...");
             order.setStatus(OrderStatus.BeingPrepared);
             orderMap.replace(OrderStatus.BeingPrepared.text, order);
             Thread.sleep(1500);
 
-            System.out.println("Cooking order...");
             order.setStatus(OrderStatus.Ready);
             orderMap.replace(OrderStatus.Ready.text, order);
             Thread.sleep(1000);
 
-            System.out.println("Order is ready...");
             Thread.sleep(2000);
         } catch (Exception e)
         {

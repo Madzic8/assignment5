@@ -9,11 +9,13 @@ public class OrderClient extends AbstractOrderClient {
     private Order order;
     private KitchenServer kitchenServer;
     Timer pollingTimer;
+    GenericRestaurantForm gui;
 
-    public OrderClient(KitchenServer kitchenServer)
+    public OrderClient(GenericRestaurantForm gui, KitchenServer kitchenServer)
     {
         this.kitchenServer = kitchenServer;
         this.order = new Order();
+        this.gui = gui;
     }
 
     /**
@@ -23,17 +25,16 @@ public class OrderClient extends AbstractOrderClient {
 
     @Override
     public void submitOrder() throws ExecutionException, InterruptedException {
-        System.out.println("Order Submitted...");
+        gui.changeStatusText("Submitting order...");
+        Thread.sleep(1000);
         order = new Order();
-        System.out.println(order.getOrderID());
-        Thread.sleep(500);
         CompletableFuture kitchenStatus = kitchenServer.receiveOrder(order);
         try
         {
             if (kitchenStatus.get() == KitchenStatus.Received)
             {
-                System.out.println("Order received...");
-                Thread.sleep(500);
+                gui.changeStatusText("Order received...");
+                Thread.sleep(1000);
                 startPollingServer(order.getOrderID());
             }
         } catch (Exception e)
@@ -56,11 +57,19 @@ public class OrderClient extends AbstractOrderClient {
             int i = 1;
             @Override
             public void run() {
+                gui.changeStatusText("Waiting for order to be ready...");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
                 while (i == 1) {
                     try {
                         CompletableFuture orderStatus = kitchenServer.checkStatus(order.getOrderID());
                         if (orderStatus.get() == OrderStatus.Ready) {
-                            System.out.println("Waiting for order to be ready...");
+                            gui.changeStatusText("Order is ready for pickup...");
+                            Thread.sleep(1000);
                             pickUpOrder();
                             cancel();
                             i = 2;
@@ -80,12 +89,13 @@ public class OrderClient extends AbstractOrderClient {
 
     @Override
     protected void pickUpOrder() throws InterruptedException, ExecutionException {
-        System.out.println("Order is getting picked up...");
+        gui.changeStatusText("Order is getting picked up...");
+        Thread.sleep(1000);
        CompletableFuture  kitchenStatus = kitchenServer.serveOrder(order.getOrderID());
        if (kitchenStatus.get() == KitchenStatus.Served)
        {
            Thread.sleep(1000);
-           System.out.println("Order is "+ order.getStatus().text);
+           gui.changeStatusText("Order is "+ order.getStatus().text);
        }
         else
            System.out.println("something went wrong");

@@ -52,8 +52,8 @@ public class GenericRestaurantForm {
     OrderItem borscht;
     OrderItem sandwich;
 
-    public GenericRestaurantForm(OrderClient orderClient){
-        this.orderClient = orderClient;
+    public GenericRestaurantForm(KitchenServer kitchenServer){
+        orderClient = new OrderClient(this, kitchenServer);
     }
 
     /**
@@ -213,7 +213,14 @@ public class GenericRestaurantForm {
             public void actionPerformed(ActionEvent e) {
                 selectedIndex = orderCartArea.getSelectedIndex();
                 selectedItem = orderCartArea.getSelectedValue();
-                orderCartModel.remove(selectedIndex);
+
+                if (selectedIndex == -1)
+                {
+                    JOptionPane.showMessageDialog(null,"Select something in your cart to remove.");
+                } else
+                {
+                    orderCartModel.remove(selectedIndex);
+                }
 
                Order order = orderClient.getOrder();
 
@@ -250,7 +257,6 @@ public class GenericRestaurantForm {
                     } else if (order.getOrderList().size() != 0)
                     {
                         orderClient.submitOrder();
-                        orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
                         orderCartModel.removeAllElements();
                     }
                 } catch (InterruptedException | ExecutionException interruptedException) {
@@ -274,7 +280,8 @@ public class GenericRestaurantForm {
         frame.add(orderStatusArea);
     }
 
-    public DefaultListModel<String> getOrderStatusModel() {
-        return orderStatusModel;
+    public void changeStatusText(String newStatus)
+    {
+        orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " " + newStatus);
     }
 }
