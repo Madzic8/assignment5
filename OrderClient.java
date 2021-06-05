@@ -14,8 +14,8 @@ public class OrderClient extends AbstractOrderClient {
     public OrderClient(GenericRestaurantForm gui, KitchenServer kitchenServer)
     {
         this.kitchenServer = kitchenServer;
-        this.order = new Order();
         this.gui = gui;
+        this.order = new Order();
     }
 
     /**
@@ -26,13 +26,12 @@ public class OrderClient extends AbstractOrderClient {
     @Override
     public void submitOrder() throws ExecutionException, InterruptedException {
         gui.changeStatusText("Submitting order...");
-        Thread.sleep(1000);
-        order = new Order();
         CompletableFuture kitchenStatus = kitchenServer.receiveOrder(order);
         try
         {
             if (kitchenStatus.get() == KitchenStatus.Received)
             {
+                Thread.sleep(1500);
                 gui.changeStatusText("Order received...");
                 Thread.sleep(1000);
                 startPollingServer(order.getOrderID());
@@ -59,7 +58,7 @@ public class OrderClient extends AbstractOrderClient {
             public void run() {
                 gui.changeStatusText("Waiting for order to be ready...");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(750);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -69,7 +68,7 @@ public class OrderClient extends AbstractOrderClient {
                         CompletableFuture orderStatus = kitchenServer.checkStatus(order.getOrderID());
                         if (orderStatus.get() == OrderStatus.Ready) {
                             gui.changeStatusText("Order is ready for pickup...");
-                            Thread.sleep(1000);
+                            Thread.sleep(1500);
                             pickUpOrder();
                             cancel();
                             i = 2;
@@ -94,7 +93,7 @@ public class OrderClient extends AbstractOrderClient {
        CompletableFuture  kitchenStatus = kitchenServer.serveOrder(order.getOrderID());
        if (kitchenStatus.get() == KitchenStatus.Served)
        {
-           Thread.sleep(1000);
+           Thread.sleep(2000);
            gui.changeStatusText("Order is "+ order.getStatus().text);
        }
         else
