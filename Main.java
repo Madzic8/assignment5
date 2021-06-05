@@ -9,6 +9,5 @@ public class Main {
         OrderClient orderClient = new OrderClient(kitchenServer);
         GenericRestaurantForm restaurant = new GenericRestaurantForm(orderClient);
         restaurant.Start();
-        DefaultListModel test = restaurant.getOrderStatusModel();
     }
 }

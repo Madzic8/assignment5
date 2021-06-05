@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
 
-public class OrderClient extends AbstractOrderClient{
+public class OrderClient extends AbstractOrderClient {
 
     private Order order;
     private KitchenServer kitchenServer;
