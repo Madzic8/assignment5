@@ -108,6 +108,7 @@ public class GenericRestaurantForm {
             public void actionPerformed(ActionEvent e) {
                 Order order = orderClient.getOrder();
                 orderCartModel.addElement("Sandwich");
+                System.out.println("Added Sandwich");
                 sandwich = new OrderItem(menuItem1Name.getText(), menuItem1Descr.getText(), 23);
                 order.addOrderItem(sandwich);
             }
@@ -145,6 +146,7 @@ public class GenericRestaurantForm {
             public void actionPerformed(ActionEvent e) {
                 Order order = orderClient.getOrder();
                 orderCartModel.addElement("Borscht");
+                System.out.println("Added Borscht");
                 borscht = new OrderItem(menuItem2Name.getText(), menuItem2Descr.getText(), 84);
                 order.addOrderItem(borscht);
             }
@@ -182,8 +184,10 @@ public class GenericRestaurantForm {
             public void actionPerformed(ActionEvent e) {
                 Order order = orderClient.getOrder();
                 orderCartModel.addElement("Coffee");
+                System.out.println("Added Coffee");
                 coffee = new OrderItem(menuItem3Name.getText(), menuItem3Descr.getText(), 18);
                 order.addOrderItem(coffee);
+
             }
         });
 
@@ -215,17 +219,17 @@ public class GenericRestaurantForm {
 
                 if (selectedItem == "Coffee")
                 {
-                    System.out.println("Added Coffee");
+                    System.out.println("Removed Coffee");
                     order.removeOrderItem(coffee);
                 }
                 if (selectedItem == "Sandwich")
                 {
-                    System.out.println("Added Sandwich");
+                    System.out.println("Removed Sandwich");
                     order.removeOrderItem(sandwich);
                 }
                 if (selectedItem == "Borscht")
                 {
-                    System.out.println("Added Borscht");
+                    System.out.println("Removed Borscht");
                     order.removeOrderItem(borscht);
                 }
             }
@@ -247,6 +251,7 @@ public class GenericRestaurantForm {
                     {
                         orderClient.submitOrder();
                         orderStatusModel.addElement(Time.valueOf(LocalTime.now()) + " Order submitted");
+                        orderCartModel.removeAllElements();
                     }
                 } catch (InterruptedException | ExecutionException interruptedException) {
                     interruptedException.printStackTrace();

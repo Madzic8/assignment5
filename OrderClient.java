@@ -24,8 +24,10 @@ public class OrderClient extends AbstractOrderClient{
     @Override
     public void submitOrder() throws ExecutionException, InterruptedException {
         System.out.println("Order Submitted...");
+        order = new Order();
+        System.out.println(order.getOrderID());
         Thread.sleep(500);
-       CompletableFuture kitchenStatus = kitchenServer.receiveOrder(order);
+        CompletableFuture kitchenStatus = kitchenServer.receiveOrder(order);
         try
         {
             if (kitchenStatus.get() == KitchenStatus.Received)
